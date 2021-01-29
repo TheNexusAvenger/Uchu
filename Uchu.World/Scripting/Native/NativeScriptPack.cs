@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Uchu.Core;
@@ -32,11 +33,10 @@ namespace Uchu.World.Scripting.Native
             {
                 if (type.BaseType != typeof(NativeScript)) return;
 
-                var zoneSpecific = type.GetCustomAttribute<ZoneSpecificAttribute>();
-
-                if (zoneSpecific != null)
+                var zoneSpecific = type.GetCustomAttributes<ZoneSpecificAttribute>().ToArray();
+                if (zoneSpecific.Length > 0)
                 {
-                    if (zoneSpecific.ZoneId != Zone.ZoneId) continue;
+                    if (zoneSpecific.FirstOrDefault(zoneSpecificEntry => zoneSpecificEntry.ZoneId == Zone.ZoneId) == default) continue;
                 }
 
                 var instance = (NativeScript) Activator.CreateInstance(type);
